@@ -1,0 +1,22 @@
+:root {
+  --kanji-colour: blue;
+  --furigana-colour: red;
+}
+
+.furigana-toggle rp, .furigana-toggle rt {
+  visibility: hidden !important;
+}
+
+.furigana-toggle-hover ruby:hover rt, .furigana-toggle-hover ruby:hover rp {
+  visibility: visible !important;
+}
+
+.furigana-toggle-colour rp, .furigana-toggle-colour rt {
+  color: red !important;
+  color: var(--furigana-colour) !important;
+}
+
+.furigana-toggle-colour ruby, .furigana-toggle-colour rb {
+  color: blue !important;
+  color: var(--kanji-colour) !important;
+}
