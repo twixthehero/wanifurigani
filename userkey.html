@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            ul {
+                list-style-type: none;
+                width: 100%;
+            }
+
+            li {
+                display: table;
+                margin: 10px auto;
+            }
+        </style>
+    </head>
+
+    <body>
+        <ul>
+            <li>Please enter your WaniKani API Key:</li>
+            <li><input id="userkey" type="text" /></li>
+            <li><button id="submitButton">Submit</button></li>
+            <li>Click <a target="_blank" href="https://www.wanikani.com/settings/account">here</a> to find yours.</li>
+        </ul>
+
+        <script src="js/wanikani.js"></script>
+        <script src="js/userkey.js"></script>
+    </body>
+</html>

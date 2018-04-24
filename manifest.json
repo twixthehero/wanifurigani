@@ -1,22 +1,31 @@
 {
     "name": "Wani-Furigani",
-    "version": "0.0.1",
+    "version": "0.2.0",
     "description": "Automatically hides furigana for Japanese Kanji based on a Wanikani user's level",
     "author": "Maximilian Wright",
     "manifest_version": 2,
     "permissions": [
         "storage",
         "tabs",
-        "*://*/*",
-        "https://www.wanikani.com/*"
+        "*://*/*"
     ],
+    "content_security_policy": "script-src 'self' https://www.wanikani.com/; object-src 'self'",
     "background": {
         "scripts": [
-            "background.js"
-        ]
+            "js/wanikani.js",
+            "js/background.js"
+        ],
+        "persistent": false
     },
+    "content_scripts": [
+        {
+            "matches": [ "http://*/*", "https://*/*" ],
+            "js": [ "js/wanikani.js", "js/content.js" ],
+            "run_at": "document_idle"
+        }
+    ],
     "web_accessible_resources": [
-      "furigana-toggle.css"
+        "css/furigana-toggle.css"
     ],
     "browser_action": {
         "default_popup": "popup.html",
@@ -25,13 +34,13 @@
             "16": "images/wanikani16.png",
             "32": "images/wanikani32.png",
             "48": "images/wanikani48.png",
-            "128": "images/wanikani16.png"
+            "128": "images/wanikani128.png"
         }
     },
     "icons": {
         "16": "images/wanikani16.png",
         "32": "images/wanikani32.png",
         "48": "images/wanikani48.png",
-        "128": "images/wanikani16.png"
+        "128": "images/wanikani128.png"
     }
 }
