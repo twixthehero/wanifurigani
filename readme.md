@@ -14,6 +14,7 @@ A Chrome extension that connects to a WaniKani user's profile and selectively hi
 1. Click "Add extension"
 
 ## To Do
+* Add resync button
 * Add hiding based on WaniKani vocabulary
 * Add FireFox version
 
