@@ -37,61 +37,77 @@ function toggle() {
     });
 }
 
-var nodes = undefined;
-var level = -1;
-var kanjiColor = "#0000ff";
-var furiganaColor = "#ff0000";
+let nodes = undefined;
+let level = -1;
+let kanjiColor = "#0000ff";
+let furiganaColor = "#ff0000";
 
 function parseData() {
     let rubies = document.getElementsByTagName("ruby");
     nodes = [];
+    let keys = [];
 
-    for (index in rubies) {
-        let wordNode = rubies[index].firstChild;
-
-        if (wordNode === undefined) {
+    for (var index in rubies) {
+        if (rubies[index].childNodes === undefined) {
+            console.log("skipping 1");
+            console.dir(rubies[index]);
+            continue;
+        }
+        if (rubies[index].childNodes.length < 2) {
+            console.log("skipping 2");
+            console.dir(rubies[index]);
             continue;
         }
 
-        let rtNode = wordNode.nextSibling;
+        let wordNode = rubies[index].firstChild;
+        let nodeName = wordNode.nodeName.toLowerCase();
+        let kanjiText = undefined;
 
-        let kanjiText = wordNode.data;
+        if (nodeName === "#text") {
+            kanjiText = wordNode.data;
+        } else if (nodeName === "span") {
+            kanjiText = wordNode.innerHTML;
+        } else {
+            console.log("unhandled type: " + nodeName);
+        }
+
+        let rtNode = wordNode.nextSibling;
         //let hiraganaText = rtNode.innerHTML;
-        nodes.push({
-            ruby: rubies[index],
-            rt: rtNode,
-            kanjis: kanjiText.split(""),
-            //hiragana: hiraganaText,
-            count: 0
-        });
+        if (nodes[kanjiText] !== undefined) {
+            nodes[kanjiText].rubies.push(rubies[index]);
+            nodes[kanjiText].rts.push(rtNode);
+        } else {
+            nodes[kanjiText] = {
+                rubies: [rubies[index]],
+                rts: [rtNode]
+            }
+            keys.push(kanjiText);
+        }
     }
 
-    for (index = 0; index < nodes.length; index++) {
-        for (i = 0; i < nodes[index].kanjis.length; i++) {
-            let r = index;
-            let k = nodes[r].kanjis[i];
-
-            chrome.runtime.sendMessage({ from: "content", subject: "kanji", character: k }, function(response) {
-                if (response !== null) {
-                    // console.log(k + " === " + response.user_specific.srs);
-    
-                    if (getSrsLevel(response.user_specific.srs) >= level) {
-                        nodes[r].count++;
-                    }
-    
-                    if (nodes[r].count == nodes[r].kanjis.length) {
-                        nodes[r].ruby.classList.add("furigana-toggle");
-                    }
-                } else {
-                    // console.log(k);
-                }
-    
-                if (r == nodes.length - 1) {
-                    hideFurigana();
-                }
-            });
+    chrome.runtime.sendMessage({
+        from: "content",
+        subject: "kanji",
+        keys: keys
+    }, function (response) {
+        if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError);
+            return;
         }
-    };
+
+        let data = response;
+        if (data !== null && data !== undefined) {
+            for (var key in data) {
+                if (data[key]) {
+                    for (var i = 0; i < nodes[key].rubies.length; i++) {
+                        nodes[key].rubies[i].classList.add("furigana-toggle");
+                    }
+                }
+            }
+
+            hideFurigana();
+        }
+    });
 }
 
 function hideFurigana() {
@@ -121,18 +137,11 @@ function showFurigana() {
     document.body.classList.remove("furigana-toggle-hover");
     document.body.classList.remove("furigana-toggle-color");
 
-    for (index in nodes) {
-        nodes[index].ruby.classList.remove("furigana-toggle");
-    }
-}
+    for (var index in nodes) {
+        let rubies = nodes[index].rubies;
 
-function getSrsLevel(srs) {
-    switch (srs) {
-        case "apprentice": return 0;
-        case "guru": return 1;
-        case "master": return 2;
-        case "enlighten": return 3;
-        case "burned": return 4;
-        default: return -1;
+        for (var i = 0; i < rubies.length; i++) {
+            rubies[i].classList.remove("furigana-toggle");
+        }
     }
 }
