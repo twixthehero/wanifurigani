@@ -1,6 +1,6 @@
 {
     "name": "Wani-Furigani",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Automatically hides furigana for Japanese Kanji based on a Wanikani user's level",
     "author": "Maximilian Wright",
     "manifest_version": 2,

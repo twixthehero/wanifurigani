@@ -33,6 +33,26 @@ window.onload = function () {
         if ("furiganaOff" in changes) {
             setState(changes.furiganaOff.newValue);
         }
+        if ("level" in changes) {
+            chrome.storage.sync.get("furiganaOff", function(data) {
+                chrome.tabs.query({
+                    currentWindow: true
+                }, function (tabs) {
+                    if (chrome.runtime.lastError) {
+                        console.log(chrome.runtime.lastError);
+                        return;
+                    }
+    
+                    for (var i in tabs) {
+                        chrome.tabs.sendMessage(tabs[i].id, {
+                            from: "popup",
+                            subject: "levelChange",
+                            on: data.furiganaOff
+                        });
+                    }
+                });
+            });
+        }
     });
 
     chrome.runtime.onMessage.addListener(function (msg, sender, response) {

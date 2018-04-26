@@ -17,6 +17,11 @@ function levelUp() {
         chrome.storage.sync.set({
             level: currentLevel
         }, function () {
+            if (chrome.runtime.lastError) {
+                console.log(chrome.runtime.lastError);
+                return;
+            }
+
             console.log("difficulty level: " + currentLevel);
         });
     });

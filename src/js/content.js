@@ -2,6 +2,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     if (msg.from === "background" && msg.subject === "toggle") {
         toggle();
     }
+    if (msg.from === "popup" && msg.subject === "levelChange" && msg.on) {
+        recalculate();
+    }
 });
 
 function toggle() {
@@ -41,21 +44,21 @@ let nodes = undefined;
 let level = -1;
 let kanjiColor = "#0000ff";
 let furiganaColor = "#ff0000";
+let keys = [];
 
 function parseData() {
     let rubies = document.getElementsByTagName("ruby");
     nodes = [];
-    let keys = [];
 
     for (var index in rubies) {
         if (rubies[index].childNodes === undefined) {
-            console.log("skipping 1");
-            console.dir(rubies[index]);
+            // console.log("skipping 1");
+            // console.dir(rubies[index]);
             continue;
         }
         if (rubies[index].childNodes.length < 2) {
-            console.log("skipping 2");
-            console.dir(rubies[index]);
+            // console.log("skipping 2");
+            // console.dir(rubies[index]);
             continue;
         }
 
@@ -69,6 +72,7 @@ function parseData() {
             kanjiText = wordNode.innerHTML;
         } else {
             console.log("unhandled type: " + nodeName);
+            console.dir(wordNode);
         }
 
         let rtNode = wordNode.nextSibling;
@@ -85,29 +89,7 @@ function parseData() {
         }
     }
 
-    chrome.runtime.sendMessage({
-        from: "content",
-        subject: "kanji",
-        keys: keys
-    }, function (response) {
-        if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-            return;
-        }
-
-        let data = response;
-        if (data !== null && data !== undefined) {
-            for (var key in data) {
-                if (data[key]) {
-                    for (var i = 0; i < nodes[key].rubies.length; i++) {
-                        nodes[key].rubies[i].classList.add("furigana-toggle");
-                    }
-                }
-            }
-
-            hideFurigana();
-        }
-    });
+    recalculate();
 }
 
 function hideFurigana() {
@@ -144,4 +126,37 @@ function showFurigana() {
             rubies[i].classList.remove("furigana-toggle");
         }
     }
+}
+
+/*
+ *  Recalculates whether each node should be hidden
+ */
+function recalculate() {
+    chrome.runtime.sendMessage({
+        from: "content",
+        subject: "kanji",
+        keys: keys
+    }, function (response) {
+        if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError);
+            return;
+        }
+
+        let data = response;
+        if (data !== null && data !== undefined) {
+            for (var key in data) {
+                if (data[key]) {
+                    for (var i = 0; i < nodes[key].rubies.length; i++) {
+                        nodes[key].rubies[i].classList.add("furigana-toggle");
+                    }
+                } else {
+                    for (var i = 0; i < nodes[key].rubies.length; i++) {
+                        nodes[key].rubies[i].classList.remove("furigana-toggle");
+                    }
+                }
+            }
+
+            hideFurigana();
+        }
+    });
 }
