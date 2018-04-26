@@ -8,12 +8,19 @@ A Chrome extension that connects to a WaniKani user's profile and selectively hi
 - Toggle learned furigana on/off
 - Change minimum level required for furigana to be hidden
 
-## Unpacked Usage
+## Installation
+
+### Google Chrome
+1. Click [here](https://chrome.google.com/webstore/detail/wani-furigani/emmjhiomlaofcbfffajikicpkficpblj) to go to the Chome Webstore page.
+1. Click '+ Add to Chrome'
+1. Click 'Add extension'
+
+## Development
 
 ### Google Chrome
 1. `git clone --recurse-submodules git@github.com:twixthehero/wanifurigani.git`
 1. `cd wanifurigani`
-1. Windows: Run `build.bat` Linux: Run `build.sh`
+1. Windows: Run `build.bat` Linux: Run `chmod +x build.sh && build.sh`
 1. Open a tab and navigate to `chrome://extensions`
 1. Click "Load unpacked"
 1. Navigate to `wanifurigani/build/` and click OK
