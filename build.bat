@@ -11,7 +11,8 @@ if exist build (
     call :run "if not exist js mkdir js"
     cd ..
 )
-call :run "copy /y src\* build\"
+call :run "xcopy /y /e src\* build\"
+call :run "copy /y WK-JS-API-Wrapper\wanikani.js build\js\"
 call :run "copy /y manifest.json build\"
 call :run "copy /y license.md build\"
 goto success
