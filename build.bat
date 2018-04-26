@@ -14,7 +14,6 @@ if exist build (
 call :run "xcopy /y /e src\* build\"
 call :run "copy /y WK-JS-API-Wrapper\wanikani.js build\js\"
 call :run "copy /y manifest.json build\"
-call :run "copy /y license.md build\"
 goto success
 
 :run

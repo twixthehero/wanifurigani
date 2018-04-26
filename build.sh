@@ -1,6 +1,5 @@
 #!/bin/bash
 
-LICENSE=license.md
 MANIFEST=manifest.json
 
 SRC_DIR=src
@@ -32,4 +31,3 @@ fi
 run "cp -r $SRC_DIR/* $BUILD_DIR"
 run "cp WK-JS-API-Wrapper/wanikani.js $JS_DIR"
 run "cp $MANIFEST $BUILD_DIR"
-run "cp $LICENSE $BUILD_DIR"
