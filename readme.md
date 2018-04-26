@@ -1,6 +1,6 @@
 # Wani-Furigani
 
-© 2018 Maximilian Wright
+by Maximilian Wright
 
 A Chrome extension that connects to a WaniKani user's profile and selectively hides furigana on webpages based on their WaniKani level.
 
