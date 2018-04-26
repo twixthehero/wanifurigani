@@ -1,7 +1,7 @@
 {
     "name": "Wani-Furigani",
-    "version": "0.3.0",
-    "description": "Automatically hides furigana for Japanese Kanji based on a Wanikani user's level",
+    "version": "0.3.1",
+    "description": "Connects to a WaniKani user's profile and selectively hides furigana on webpages based on their SRS level.",
     "author": "Maximilian Wright",
     "manifest_version": 2,
     "permissions": [
