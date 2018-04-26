@@ -8,10 +8,15 @@ A Chrome extension that connects to a WaniKani user's profile and selectively hi
 - Toggle learned furigana on/off
 - Change minimum level required for furigana to be hidden
 
-## Usage
-1. Click [here](https://www.google.com) to go to the Chrome store
-1. Click "+ Add to Chrome"
-1. Click "Add extension"
+## Unpacked Usage
+
+### Google Chrome
+1. `git clone --recurse-submodules git@github.com:twixthehero/wanifurigani.git`
+1. `cd wanifurigani`
+1. Windows: Run `build.bat` Linux: Run `build.sh`
+1. Open a tab and navigate to `chrome://extensions`
+1. Click "Load unpacked"
+1. Navigate to `wanifurigani/build/` and click OK
 
 ## To Do
 * Add resync button
@@ -23,4 +28,3 @@ A Chrome extension that connects to a WaniKani user's profile and selectively hi
 
 Credits:
 * https://github.com/darren-lester/furigana-toggle
-* https://github.com/WaniKani/JS-API-Wrapper
