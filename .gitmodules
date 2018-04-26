@@ -1,0 +1,3 @@
+[submodule "WK-JS-API-Wrapper"]
+	path = WK-JS-API-Wrapper
+	url = git@github.com:WaniKani/JS-API-Wrapper.git
