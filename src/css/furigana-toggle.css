@@ -1,6 +1,6 @@
 :root {
-  --kanji-colour: blue;
-  --furigana-colour: red;
+  --kanji-color: blue;
+  --furigana-color: red;
 }
 
 .furigana-toggle rp, .furigana-toggle rt {
@@ -11,12 +11,12 @@
   visibility: visible !important;
 }
 
-.furigana-toggle-colour rp, .furigana-toggle-colour rt {
+.furigana-toggle-color rp, .furigana-toggle-color rt {
   color: red !important;
-  color: var(--furigana-colour) !important;
+  color: var(--furigana-color) !important;
 }
 
-.furigana-toggle-colour ruby, .furigana-toggle-colour rb {
+.furigana-toggle-color ruby, .furigana-toggle-color rb {
   color: blue !important;
-  color: var(--kanji-colour) !important;
+  color: var(--kanji-color) !important;
 }
