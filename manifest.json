@@ -1,6 +1,6 @@
 {
     "name": "Wani-Furigani",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "Connects to a WaniKani user's profile and selectively hides furigana on webpages based on their SRS level.",
     "author": "Maximilian Wright",
     "manifest_version": 2,
