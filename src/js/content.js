@@ -68,7 +68,7 @@ function parseData() {
 
         if (nodeName === "#text") {
             kanjiText = wordNode.data;
-        } else if (nodeName === "span") {
+        } else if (nodeName === "span" || nodeName === "rb") {
             kanjiText = wordNode.innerHTML;
         } else {
             console.log("unhandled type: " + nodeName);
