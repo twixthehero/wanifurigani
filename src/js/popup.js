@@ -3,6 +3,7 @@ let image = document.getElementById("image");
 let background = document.getElementById("background");
 let text = document.getElementById("text");
 let onButton = document.getElementById("switch");
+let syncButton = document.getElementById("sync");
 
 let levelColors = ["#DD0093", "#882D9E", "#294DDB", "#0093DD", "#434343"];
 let levelNames = ["Apprentice", "Guru", "Master", "Enlightened", "Burned"];
@@ -37,8 +38,21 @@ function toggle() {
     });
 }
 
+function sync() {
+    chrome.runtime.sendMessage({
+        "from": "popup",
+        "subject": "sync"
+    }, function() {
+        if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError);
+            return;
+        }
+    });
+}
+
 changeLevel.onclick = levelUp;
 onButton.onclick = toggle;
+syncButton.onclick = sync;
 
 chrome.storage.sync.get("level", function (data) {
     background.style = "background-color: " + levelColors[data.level];

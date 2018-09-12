@@ -1,173 +1,195 @@
 "use strict";
 
-chrome.runtime.onInstalled.addListener(function () {
-    chrome.storage.sync.set({
-        level: 0
-    });
-});
+let user = undefined;
 
-window.onload = function () {
-    let user = undefined;
+function showUserkeyPage() {
+    chrome.tabs.create({
+        url: chrome.extension.getURL("userkey.html")
+    })
+}
 
-    chrome.storage.sync.get("userkey", function (data) {
+function start() {
+    chrome.storage.sync.get("userkey", function(data) {
+        // only initialize defaults if we don't already have userkey
         if (data.userkey === undefined) {
-            console.log("no userkey found!");
-            chrome.tabs.create({
-                url: chrome.extension.getURL("userkey.html")
-            })
+            chrome.storage.sync.set({
+                level: 0,
+                userkey: undefined
+            });
+
+            showUserkeyPage();
         } else {
-            console.log("found userkey");
             init(data.userkey);
         }
     });
+}
 
-    chrome.tabs.onActivated.addListener(function (activeInfo) {
-        hideFuriganaForTab(activeInfo.tabId);
-    });
+function init(userkey) {
+    console.log("using userkey: " + userkey);
+    user = wanikani.getUser(userkey);
 
-    chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-        hideFuriganaForTab(tabId);
-    });
+    user.getKanji().then(function (user) {
+        console.log(user.kanji);
+    }, onError);
+    user.getVocab().then(function (user) {
+        console.log(user.vocabulary);
+    }, onError);
+}
 
-    chrome.storage.onChanged.addListener(function (changes) {
-        if ("furiganaOff" in changes) {
-            setState(changes.furiganaOff.newValue);
-        }
-        if ("level" in changes) {
-            chrome.storage.sync.get("furiganaOff", function(data) {
-                chrome.tabs.query({
-                    currentWindow: true
-                }, function (tabs) {
-                    if (chrome.runtime.lastError) {
-                        console.log(chrome.runtime.lastError);
-                        return;
-                    }
-    
-                    for (var i in tabs) {
-                        chrome.tabs.sendMessage(tabs[i].id, {
-                            from: "popup",
-                            subject: "levelChange",
-                            on: data.furiganaOff
-                        });
-                    }
-                });
+function onError(info) {
+    console.log("error");
+    console.dir(info);
+}
+
+chrome.runtime.onInstalled.addListener(function () {
+    console.log("onInstalled");
+    start();
+});
+
+chrome.runtime.onStartup.addListener(function() {
+    console.log("onStartup");
+    start();
+});
+
+chrome.runtime.onSuspend.addListener(function () {
+    console.log("onSuspend");
+});
+
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+    hideFuriganaForTab(activeInfo.tabId);
+});
+
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    hideFuriganaForTab(tabId);
+});
+
+chrome.storage.onChanged.addListener(function (changes) {
+    if ("furiganaOff" in changes) {
+        setState(changes.furiganaOff.newValue);
+    }
+
+    if ("level" in changes) {
+        chrome.storage.sync.get("furiganaOff", function(data) {
+            chrome.tabs.query({
+                currentWindow: true
+            }, function (tabs) {
+                if (chrome.runtime.lastError) {
+                    console.log(chrome.runtime.lastError);
+                    return;
+                }
+
+                for (var i in tabs) {
+                    chrome.tabs.sendMessage(tabs[i].id, {
+                        from: "popup",
+                        subject: "levelChange",
+                        on: data.furiganaOff
+                    });
+                }
             });
-        }
-    });
+        });
+    }
+});
 
-    chrome.runtime.onMessage.addListener(function (msg, sender, response) {
-        if (msg.from === "userkey" && msg.subject === "userkey") {
-            chrome.storage.sync.set({
-                "userkey": msg.userkey
-            }, function () {
-                init(msg.userkey);
-                response();
-            });
+chrome.runtime.onMessage.addListener(function (msg, sender, response) {
+    if (msg.from === "userkey" && msg.subject === "userkey") {
+        chrome.storage.sync.set({
+            "userkey": msg.userkey
+        }, function () {
+            init(msg.userkey);
+            response();
+        });
 
-            return true;
-        }
-        if (msg.from === "content" && msg.subject === "kanji") {
-            let data = {};
+        return true;
+    }
 
-            chrome.storage.sync.get("level", function (obj) {
-                let keys = msg.keys;
+    if (msg.from === "content" && msg.subject === "kanji") {
+        let data = {};
 
-                for (var index in keys) {
-                    let key = keys[index];
-                    // console.log("checking " + key);
-                    let parts = key.split("");
-                    let shouldHide = true;
+        chrome.storage.sync.get("level", function (obj) {
+            let keys = msg.keys;
 
-                    for (var i = 0; i < parts.length; i++) {
-                        let char = user.kanji.getByCharacter(parts[i]);
+            for (var index in keys) {
+                let key = keys[index];
+                // console.log("checking " + key);
+                let parts = key.split("");
+                let shouldHide = true;
 
-                        if (char === undefined) {
-                            // console.log("not unlocked: " + parts[i]);
-                            shouldHide = false;
-                            break;
-                        }
+                for (var i = 0; i < parts.length; i++) {
+                    let char = user.kanji.getByCharacter(parts[i]);
 
-                        if (char.data === null || char.data.user_specific === null) {
-                            // console.log(char.data);
-                            shouldHide = false;
-                            break;
-                        }
-
-                        if (getSrsLevel(char.data.user_specific.srs) < obj.level) {
-                            // console.log("under SRS level " + obj.level + ": " + parts[i]);
-                            shouldHide = false;
-                            break;
-                        }
+                    if (char === undefined) {
+                        // console.log("not unlocked: " + parts[i]);
+                        shouldHide = false;
+                        break;
                     }
 
-                    data[key] = shouldHide;
-                    if (!shouldHide) {
-                        console.log("not hiding '" + key + "'");
+                    if (char.data === null || char.data.user_specific === null) {
+                        // console.log(char.data);
+                        shouldHide = false;
+                        break;
+                    }
+
+                    if (getSrsLevel(char.data.user_specific.srs) < obj.level) {
+                        // console.log("under SRS level " + obj.level + ": " + parts[i]);
+                        shouldHide = false;
+                        break;
                     }
                 }
 
-                response(data);
-            });
+                data[key] = shouldHide;
+                // if (!shouldHide) {
+                //     console.log("not hiding '" + key + "'");
+                // }
+            }
 
-            return true;
-        }
+            response(data);
+        });
+
+        return true;
+    }
+
+    if (msg.from === "popup" && msg.subject === "sync") {
+        
+    }
+});
+
+function setState(on) {
+    chrome.storage.sync.set({
+        "furiganaOff": on
     });
 
-    function init(userkey) {
-        console.log("using userkey: " + userkey);
-        user = wanikani.getUser(userkey);
+    const badgeText = on ? "ON" : "";
+    chrome.browserAction.setBadgeText({
+        text: badgeText
+    });
 
-        user.getKanji().then(function (user) {
-            console.log(user.kanji);
-        }, onError);
-        user.getVocab().then(function (user) {
-            console.log(user.vocabulary);
-        }, onError);
-    }
-
-    function onError(info) {
-        console.log("error");
-        console.dir(info);
-    }
-
-    function setState(on) {
-        chrome.storage.sync.set({
-            "furiganaOff": on
-        });
-
-        const badgeText = on ? "ON" : "";
-        chrome.browserAction.setBadgeText({
-            text: badgeText
-        });
-
-        if (on) {
-            chrome.tabs.query({
-                currentWindow: true,
-                active: true
-            }, function (info) {
-                hideFuriganaForTab(info[0].id);
-            });
-        } else {
-            showFuriganaAllTabs();
-        }
-    }
-
-    function showFuriganaAllTabs() {
+    if (on) {
         chrome.tabs.query({
-            currentWindow: true
-        }, function (tabs) {
-            tabs.forEach(function (tab) {
-                hideFuriganaForTab(tab.id);
-            });
+            currentWindow: true,
+            active: true
+        }, function (info) {
+            hideFuriganaForTab(info[0].id);
         });
+    } else {
+        showFuriganaAllTabs();
     }
+}
 
-    function hideFuriganaForTab(id) {
-        chrome.tabs.sendMessage(id, {
-            from: "background",
-            subject: "toggle"
+function showFuriganaAllTabs() {
+    chrome.tabs.query({
+        currentWindow: true
+    }, function (tabs) {
+        tabs.forEach(function (tab) {
+            hideFuriganaForTab(tab.id);
         });
-    }
+    });
+}
+
+function hideFuriganaForTab(id) {
+    chrome.tabs.sendMessage(id, {
+        from: "background",
+        subject: "toggle"
+    });
 }
 
 function getSrsLevel(srs) {
