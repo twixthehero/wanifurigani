@@ -29,5 +29,4 @@ if [ ! -d "$BUILD_DIR" ]; then
 fi
 
 run "cp -r $SRC_DIR/* $BUILD_DIR"
-run "cp WK-JS-API-Wrapper/wanikani.js $JS_DIR"
 run "cp $MANIFEST $BUILD_DIR"
