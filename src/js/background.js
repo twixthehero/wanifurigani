@@ -26,14 +26,15 @@ function start() {
 
 function init(userkey) {
     console.log("using userkey: " + userkey);
-    user = wanikani.getUser(userkey);
+    user = new User(userkey);
+    user.sync().then(function() {
+        console.log("finished user sync");
+        console.log(user);
+    });
 
-    user.getKanji().then(function (user) {
-        console.log(user.kanji);
-    }, onError);
-    user.getVocab().then(function (user) {
-        console.log(user.vocabulary);
-    }, onError);
+    chrome.storage.sync.get("furiganaOff", function(data) {
+        setState(data.furiganaOff);
+    });
 }
 
 function onError(info) {
@@ -115,21 +116,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
                 let shouldHide = true;
 
                 for (var i = 0; i < parts.length; i++) {
-                    let char = user.kanji.getByCharacter(parts[i]);
-
-                    if (char === undefined) {
-                        // console.log("not unlocked: " + parts[i]);
-                        shouldHide = false;
-                        break;
-                    }
-
-                    if (char.data === null || char.data.user_specific === null) {
-                        // console.log(char.data);
-                        shouldHide = false;
-                        break;
-                    }
-
-                    if (getSrsLevel(char.data.user_specific.srs) < obj.level) {
+                    if (user.getKanjiLevel(parts[i]) < obj.level) {
                         // console.log("under SRS level " + obj.level + ": " + parts[i]);
                         shouldHide = false;
                         break;
@@ -190,21 +177,4 @@ function hideFuriganaForTab(id) {
         from: "background",
         subject: "toggle"
     });
-}
-
-function getSrsLevel(srs) {
-    switch (srs) {
-        case "apprentice":
-            return 0;
-        case "guru":
-            return 1;
-        case "master":
-            return 2;
-        case "enlighten":
-            return 3;
-        case "burned":
-            return 4;
-        default:
-            return -1;
-    }
 }

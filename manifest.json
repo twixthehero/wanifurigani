@@ -13,7 +13,7 @@
     "content_security_policy": "script-src 'self' https://www.wanikani.com/; object-src 'self'",
     "background": {
         "scripts": [
-            "js/wanikani.js",
+            "js/api.js",
             "js/background.js"
         ],
         "persistent": false
@@ -21,7 +21,7 @@
     "content_scripts": [
         {
             "matches": [ "http://*/*", "https://*/*" ],
-            "js": [ "js/wanikani.js", "js/content.js" ],
+            "js": [ "js/api.js", "js/content.js" ],
             "run_at": "document_idle"
         }
     ],
