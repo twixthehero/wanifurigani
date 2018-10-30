@@ -1,4 +1,4 @@
-# Wani-Furigani
+# Wani-Furigani v0.3.3
 
 by Maximilian Wright
 
@@ -6,6 +6,7 @@ A Chrome extension that connects to a WaniKani user's profile and selectively hi
 
 ## Features
 - Toggle learned furigana on/off
+- Hover to show furigana
 - Change minimum level required for furigana to be hidden
 
 ## Installation
@@ -18,7 +19,7 @@ A Chrome extension that connects to a WaniKani user's profile and selectively hi
 ## Development
 
 ### Google Chrome
-1. `git clone --recurse-submodules git@github.com:twixthehero/wanifurigani.git`
+1. `git clone git@github.com:twixthehero/wanifurigani.git`
 1. `cd wanifurigani`
 1. Windows: Run `build.bat` Linux: Run `chmod +x build.sh && build.sh`
 1. Open a tab and navigate to `chrome://extensions`
@@ -26,7 +27,6 @@ A Chrome extension that connects to a WaniKani user's profile and selectively hi
 1. Navigate to `wanifurigani/build/` and click OK
 
 ## To Do
-* Add resync button
 * Add hiding based on WaniKani vocabulary
 * Add FireFox version
 
