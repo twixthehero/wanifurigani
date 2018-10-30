@@ -136,7 +136,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     }
 
     if (msg.from === "popup" && msg.subject === "sync") {
-        
+        user.sync().then(function() {
+            console.log("finished user sync");
+            console.log(user);
+        });
     }
 });
 
