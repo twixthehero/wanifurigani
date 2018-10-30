@@ -10,7 +10,7 @@ const HttpClient = class {
     get(rest) {
         return new Promise((resolve, reject) => {
             const request = new XMLHttpRequest();
-            request.onreadystatechange = function() {
+            request.onreadystatechange = function () {
                 if (request.readyState == 4) {
                     if (request.status == 200) {
                         resolve(request.responseText);
@@ -47,7 +47,7 @@ const User = class {
     _syncKanji() {
         this.kanji = {};
 
-        return this.client.get(this.apiKey + "/kanji").then((function(response) {
+        return this.client.get(this.apiKey + "/kanji").then((function (response) {
             console.log("got kanji");
             var json = JSON.parse(response);
             var data = json.requested_information;
@@ -57,7 +57,7 @@ const User = class {
                     this.kanji[data[i].character] = new Kanji(data[i]);
                 }
             }
-        }).bind(this), function(code, msg) {
+        }).bind(this), function (code, msg) {
             console.log(code + ": " + msg);
         });
     }
@@ -65,7 +65,7 @@ const User = class {
     _syncVocab() {
         this.vocab = {};
 
-        return this.client.get(this.apiKey + "/vocabulary").then((function(response) {
+        return this.client.get(this.apiKey + "/vocabulary").then((function (response) {
             console.log("got vocab");
             var json = JSON.parse(response);
             var data = json.requested_information.general;
@@ -76,43 +76,51 @@ const User = class {
                 }
             }
             this.lastSync = new Date().getTime();
-        }).bind(this), function(code, msg) {
+        }).bind(this), function (code, msg) {
             console.log(code + ": " + msg);
         });
     }
 
     getKanjiLevel(k) {
         if (this.kanji[k] !== undefined) {
-            return this.kanji[k].levelNumber;
+            return this.kanji[k].srsNumber;
         }
-        
+
         return -1;
     }
 
     getVocabLevel(v) {
         if (this.vocab[v] !== undefined) {
-            return this.kanji[v].levelNumber;
+            return this.vocab[v].srsNumber;
         }
-        
+
         return -1;
     }
 };
 
-function getLevelNumber(level) {
+function getSrsNumber(level) {
     switch (level) {
-        case "apprentice": return 0;
-        case "guru": return 1;
-        case "master": return 2;
-        case "englighten": return 3;
-        case "burned": return 4;
-        default: return -1;
+        case "apprentice":
+            return 0;
+        case "guru":
+            return 1;
+        case "master":
+            return 2;
+        case "enlighten":
+            return 3;
+        case "burned":
+            return 4;
+        default:
+            console.log("failed to get level number: " + level);
+            return -1;
     }
 }
 
 const Kanji = class {
     constructor(data) {
+        // the level this kanji shows up
         this.level = data.level;
-        this.levelNumber = getLevelNumber(this.level);
+
         this.character = data.character;
         this.meaning = data.meaning.split(", ");
         this.onyomi = data.onyomi === null ? null : data.onyomi.split(", ");
@@ -120,16 +128,23 @@ const Kanji = class {
         this.important_reading = data.important_reading;
         this.nanori = data.nanori;
         this.user_specific = data.user_specific;
+
+        // internal enum for srs text
+        this.srsNumber = getSrsNumber(this.user_specific.srs);
     }
 };
 
 const Vocab = class {
     constructor(data) {
+        // the level this vocab shows up
         this.level = data.level;
-        this.levelNumber = getLevelNumber(this.level);
+
         this.character = data.character;
         this.kana = data.kana.split(", ");
         this.meaning = data.meaning.split(", ");
         this.user_specific = data.user_specific;
+
+        // internal enum for srs text
+        this.srsNumber = getSrsNumber(this.user_specific.srs);
     }
 };
