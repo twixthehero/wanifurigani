@@ -32,9 +32,9 @@ function init(userkey) {
         console.log(user);
     });
 
-    user.getKanji().then(function (user) {
-        console.log(user.kanji);
-    }, onError);
+    chrome.storage.sync.get("furiganaOff", function(data) {
+        setState(data.furiganaOff);
+    });
 }
 
 function onError(info) {
