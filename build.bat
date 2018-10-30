@@ -12,7 +12,6 @@ if exist build (
     cd ..
 )
 call :run "xcopy /y /e src\* build\"
-call :run "copy /y WK-JS-API-Wrapper\wanikani.js build\js\"
 call :run "copy /y manifest.json build\"
 goto success
 
